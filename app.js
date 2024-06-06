@@ -1,7 +1,9 @@
 const express = require("express");
 const app = express();
-const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken')
+
 
 //import files
 const dbConnect = require('./db/dbConnect')
@@ -43,6 +45,48 @@ app.post('/register', (req, res) => {
         .catch(err => {
             res.status(500).send({
                 message: "Password was not hashed successfully",
+                err,
+            })
+        })
+})
+
+//login user
+app.post('/login', (req, res) => {
+    //find user
+    User.findOne({ email: req.body.email })
+        .then(user => {
+            bcrypt.compare(req.body.password, user.password)
+                .then(passwordCheck => {
+                    // password did not match?
+                    if(!passwordCheck){
+                        return res.status(400).send({
+                            message: 'password does not match',
+                        })
+                    }
+                    //if password match
+                    //create jwt
+                    const token = jwt.sign({
+                            userId: user._id,
+                            userEmail: user.email,
+                        },'RANDOM-TOKEN',{expiresIn: '24h'}
+                    )
+                    //return response
+                    res.status(201).send({
+                        message: 'login successful',
+                        email: user.email,
+                        token,
+                    })
+                })
+                .catch(err => {
+                    res.status(400).send({
+                        message: "something went wrong while comparing passwords",
+                        err,
+                    })
+                })
+        })
+        .catch(err => {
+            res.status(404).send({
+                message: "Email not found",
                 err,
             })
         })
