@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken')
 //import files
 const dbConnect = require('./db/dbConnect')
 const User = require('./db/userModel')
+const auth = require('./auth')
 
 //execute connection
 dbConnect()
@@ -91,5 +92,16 @@ app.post('/login', (req, res) => {
             })
         })
 })
+
+
+// free endpoint
+app.get("/free-endpoint", (req, res) => {
+    res.json({ message: "You are free to access me anytime" });
+});
+
+// authentication endpoint
+app.get("/auth-endpoint", auth, (req, res) => {
+    res.json({ message: "You are authorized to access me" });
+});
 
 module.exports = app;
