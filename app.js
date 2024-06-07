@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken')
+const cors = require('cors')
 
 
 //import files
@@ -26,7 +27,12 @@ app.use((req, res, next) => {
     )
     next()
 })
-
+//by passing the cors issue on a local lift
+app.use(cors({
+    origin:'https://localhost:3001',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+}))
 
 // body parser configuration
 // need this to read the request body
